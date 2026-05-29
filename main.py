@@ -8,6 +8,8 @@ flashcards = [
 
 def run_app(cards):
 	total = len(cards)
+	understand = []
+	still_learning = []
 	# introduction
 	print("\n Welcome to Flashcard Quiz!")
 	print(f"   {total} cards to go. \n")
@@ -24,11 +26,17 @@ def run_app(cards):
 		option = input("").strip()
 		if option == "":
 			print(answer)
+			sort = input("Did you get it right? y/n:").strip().lower()
+			if sort == "y":
+				understand.append(card)
+			if sort == "n":
+				still_learning.append(card)
 		if option == "quit":
 			break
 
 		print("-" * 40)
-
+	print(understand)
+	print(still_learning)
 if __name__ == '__main__':
 	run_app(flashcards)
 
