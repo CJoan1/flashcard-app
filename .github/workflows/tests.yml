@@ -1,0 +1,23 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, card-sorting ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Run tests
+        run: python -m unittest -v
