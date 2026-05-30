@@ -7,46 +7,102 @@ flashcards = [
 ]
 
 
-understand = []
-still_learning = []
-
-
 def game_logic(cards):
+    """
+    Runs the quiz loop over a list of flashcards.
+
+    Shows each card one at a time, reveals the answer on Enter,
+    and sorts each card based on the user's response.
+    Exits early if the user types 'quit'.
+
+    Args:
+        cards (list): list of dicts with 'question' and 'answer' keys
+
+    Returns:
+        understand (list): cards the user got right
+        still_learning (list): cards the user got wrong
+    """
     total = len(cards)
+    understand = []
+    still_learning = []
+
     for idx, card in enumerate(cards, start=1):
-        # list what number we are on
+        # show progress — e.g. "2 of 5"
         print(f" {idx} of {total}")
+
         question = card['question']
         answer = card['answer']
         print(question)
-        # see answer
+
+        # wait for user to press Enter or type a command
         option = input("").strip()
+
         if option == "":
             print(answer)
-            # sort card into understand and still-learning
+            # ask user if they got it right and sort accordingly
             sort = input("Did you get it right? y/n:").strip().lower()
-            if sort == "y":
-                understand.append(card)
-            if sort == "n":
-                still_learning.append(card)
-        # quit app
+            sort_card(card, understand, still_learning, sort)
+
+        # exit the quiz early, returning whatever was sorted so far
         if option == "quit":
-            return
+            return understand, still_learning
+
         print("-" * 40)
-    # Review hard questions
-    if still_learning:
-        response = input("Do you want to practice the quesionts you got wrong? y/n").strip().lower()
+
+    return understand, still_learning
+
+
+def sort_card(card, understand, still_learning, sort):
+    """
+    Sorts a single card into the understand or still_learning list.
+
+    Args:
+        card (dict): the flashcard being sorted
+        understand (list): cards the user got right
+        still_learning (list): cards the user got wrong
+        sort (str): user input — 'y' for correct, 'n' for incorrect
+    """
+    if sort == "y":
+        understand.append(card)  # user got it right
+    if sort == "n":
+        still_learning.append(card)  # user got it wrong
+
+
+def offer_practice(cards):
+    """
+    Offers the user a chance to practice cards they got wrong.
+
+    Loops until the user declines or all cards are moved
+    to understand.
+
+    Args:
+        cards (list): cards the user got wrong
+    """
+    while cards:
+        # keep offering practice as long as there are wrong cards
+        response = input("Do you want to practice the questions you got wrong? y/n:").strip().lower()
+
         if response == "y":
-            practice(still_learning.copy())
+            # run another quiz round with only the wrong cards
+            # cards is reassigned to the new still_learning each round
+            understand, cards = game_logic(cards)
+
         if response == "n":
-            return
-def practice(cards):
-    still_learning.clear()
-    game_logic(cards)
+            break  # user chose to stop — exit the loop
 
 
 def run_app(cards):
+    """
+    Entry point for the flashcard app.
+
+    Prints the introduction, runs the main quiz, then
+    offers a practice round for any cards answered incorrectly.
+
+    Args:
+        cards (list): the full list of flashcards to quiz
+    """
     total = len(cards)
+
     # introduction
     print("\n Welcome to Flashcard Quiz!")
     print(f"   {total} cards to go. \n")
@@ -54,12 +110,11 @@ def run_app(cards):
     print("Type quit to exit.")
     print("-" * 40)
 
+    # run the main quiz and capture results
+    understand, still_learning = game_logic(cards)
 
-    game_logic(cards)
-
-
-    print(understand)
-    print(still_learning)
+    # offer a practice round for wrong answers if there are any
+    offer_practice(still_learning)
 
 
 if __name__ == '__main__':
