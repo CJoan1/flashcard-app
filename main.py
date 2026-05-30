@@ -6,19 +6,20 @@ flashcards = [
     {"question": "What does RAM stand for?", "answer": "Random Access Memory"},
 ]
 
+
 understand = []
 still_learning = []
 
+
 def game_logic(cards):
     total = len(cards)
-
     for idx, card in enumerate(cards, start=1):
         # list what number we are on
         print(f" {idx} of {total}")
         question = card['question']
         answer = card['answer']
         print(question)
-        # see answer 
+        # see answer
         option = input("").strip()
         if option == "":
             print(answer)
@@ -30,16 +31,19 @@ def game_logic(cards):
                 still_learning.append(card)
         # quit app
         if option == "quit":
-            break
+            return
         print("-" * 40)
     # Review hard questions
-    response = input("Do you want to practice the quesionts you got wrong? y/n").strip().lower()
-    if response == "y":
-        practice(still_learning)
-    if response == "n":
-        return
+    if still_learning:
+        response = input("Do you want to practice the quesionts you got wrong? y/n").strip().lower()
+        if response == "y":
+            practice(still_learning.copy())
+        if response == "n":
+            return
 def practice(cards):
-    game_logic(still_learning)
+    still_learning.clear()
+    game_logic(cards)
+
 
 def run_app(cards):
     total = len(cards)
@@ -50,10 +54,13 @@ def run_app(cards):
     print("Type quit to exit.")
     print("-" * 40)
 
+
     game_logic(cards)
+
 
     print(understand)
     print(still_learning)
+
 
 if __name__ == '__main__':
     run_app(flashcards)
