@@ -1,3 +1,5 @@
+import random
+
 flashcards = [
     {"question": "What is the capital of France?", "answer": "Paris"},
     {"question": "What does CPU stand for?", "answer": "Central Processing Unit"},
@@ -25,6 +27,10 @@ def game_logic(cards):
     total = len(cards)
     understand = []
     still_learning = []
+    # Shuffle cards
+    shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
+    if shuffle == "y":
+        shuffle_cards(cards)
 
     for idx, card in enumerate(cards, start=1):
         # show progress — e.g. "2 of 5"
@@ -51,6 +57,8 @@ def game_logic(cards):
 
     return understand, still_learning
 
+def shuffle_cards(cards):
+    random.shuffle(cards)
 
 def sort_card(card, understand, still_learning, sort):
     """
