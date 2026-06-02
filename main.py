@@ -27,10 +27,6 @@ def game_logic(cards):
     total = len(cards)
     understand = []
     still_learning = []
-    # Shuffle cards
-    shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
-    if shuffle == "y":
-        shuffle_cards(cards)
 
     for idx, card in enumerate(cards, start=1):
         # show progress — e.g. "2 of 5"
@@ -93,6 +89,9 @@ def offer_practice(cards):
         if response == "y":
             # run another quiz round with only the wrong cards
             # cards is reassigned to the new still_learning each round
+            shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
+            if shuffle == "y":
+                shuffle_cards(cards)
             understand, cards = game_logic(cards)
 
         if response == "n":
@@ -118,6 +117,10 @@ def run_app(cards):
     print("Type quit to exit.")
     print("-" * 40)
 
+    # Shuffle cards
+    shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
+    if shuffle == "y":
+        shuffle_cards(cards)
     # run the main quiz and capture results
     understand, still_learning = game_logic(cards)
 
