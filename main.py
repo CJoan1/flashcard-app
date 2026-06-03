@@ -1,4 +1,7 @@
 import random
+UNDERSTAND = "understand"
+STILL_LEARNING = "still_learning"
+QUIT_COMMAND = "quit"
 
 flashcards = [
     {"question": "What is the capital of France?", "answer": "Paris"},
@@ -35,25 +38,47 @@ def game_logic(cards):
         question = card['question']
         answer = card['answer']
         print(question)
+        hints_used = 0
+        print(mask_answer(answer))
 
-        # wait for user to press Enter or type a command
-        option = input("").strip()
+        while True:
+            # wait for user to type in answer or type a command
+            option = input("Answer (or 'hint'): ").strip().lower()
 
-        if option == "":
-            print(answer)
-            # ask user if they got it right and sort accordingly
-            sort = input("Did you get it right? y/n:").strip().lower()
-            sort_card(card, understand, still_learning, sort)
+            # exit the quiz early, returning whatever was sorted so far
+            if option == QUIT_COMMAND:
+                return understand, still_learning
+            
+            elif option == "hint":
+                hints_used += 1
+                print(reveal_hint(hints_used, answer))
+            
+            # if answer is correct
+            elif option == answer.lower():
+                print("Correct!")
+                # ask user if they got it right and sort accordingly
+                sort = UNDERSTAND
+                sort_card(card, understand, still_learning, sort)
+                break
 
-        # exit the quiz early, returning whatever was sorted so far
-        if option == "quit":
-            return understand, still_learning
-
+            elif option == "" or option != answer.lower():
+                print(f"You missed it: {answer}")
+                # ask user if they got it right and sort accordingly
+                sort = STILL_LEARNING
+                sort_card(card, understand, still_learning, sort)
+                break
+        
         print("-" * 40)
 
     return understand, still_learning
 
 def shuffle_cards(cards):
+    """
+    Shuffles the list of cards in place using random.shuffle.
+ 
+    Args:
+        cards (list): the list of flashcards to shuffle
+    """
     random.shuffle(cards)
 
 def sort_card(card, understand, still_learning, sort):
@@ -66,9 +91,9 @@ def sort_card(card, understand, still_learning, sort):
         still_learning (list): cards the user got wrong
         sort (str): user input — 'y' for correct, 'n' for incorrect
     """
-    if sort == "y":
+    if sort == UNDERSTAND:
         understand.append(card)  # user got it right
-    if sort == "n":
+    if sort == STILL_LEARNING:
         still_learning.append(card)  # user got it wrong
 
 
@@ -85,6 +110,9 @@ def offer_practice(cards):
     while cards:
         # keep offering practice as long as there are wrong cards
         response = input("Do you want to practice the questions you got wrong? y/n:").strip().lower()
+        
+        if response== QUIT_COMMAND:
+            break  # done — exit the loop
 
         if response == "y":
             # run another quiz round with only the wrong cards
@@ -92,10 +120,51 @@ def offer_practice(cards):
             shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
             if shuffle == "y":
                 shuffle_cards(cards)
-            understand, cards = game_logic(cards)
+                understand, cards = game_logic(cards)
+            elif shuffle == "n":
+                understand, cards = game_logic(cards)
 
         if response == "n":
-            break  # user chose to stop — exit the loop
+            return # user chose to stop — exit the loop
+
+def mask_answer(answer):
+    """
+    Replaces every character in the answer with an underscore,
+    preserving spaces so multi-word answers stay readable.
+ 
+    Args:
+        answer (str): the correct answer to mask
+ 
+    Returns:
+        str: the masked answer — e.g. "Paris" becomes "_ _ _ _ _"
+    """
+    return " ".join("_" if char != " " else " " for char in answer)
+
+
+def reveal_hint(hints_used, answer):
+    """
+    Reveals a given number of letters from the start of the answer,
+    replacing the rest with underscores.
+ 
+    Args:
+        hints_used (int): how many letters to reveal from the left
+        answer (str): the correct answer
+ 
+    Returns:
+        str: partially revealed answer — e.g. "P a _ _ _" for hints_used=2
+    """
+    result = []
+    revealed = 0
+    for char in answer:
+        if char == " ":
+            result.append(" ")
+        elif revealed < hints_used:
+            result.append(char)   # reveal this letter
+            revealed += 1
+        else:
+            result.append("_")    # still hidden
+    return " ".join(result)
+
 
 
 def run_app(cards):
@@ -119,13 +188,22 @@ def run_app(cards):
 
     # Shuffle cards
     shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
-    if shuffle == "y":
-        shuffle_cards(cards)
-    # run the main quiz and capture results
-    understand, still_learning = game_logic(cards)
-
-    # offer a practice round for wrong answers if there are any
-    offer_practice(still_learning)
+    # exit the quiz early, returning whatever was sorted so far
+    while True:
+        if shuffle == QUIT_COMMAND:
+            break  # done — exit the loop
+        elif shuffle in ("y", "n"):
+            if shuffle == "y":
+                shuffle_cards(cards)
+            # run the main quiz and capture results
+            understand, still_learning = game_logic(cards)
+            # offer a practice round for wrong answers if there are any
+            offer_practice(still_learning)
+            break
+        else:
+            print("Invalid response")
+            shuffle = input("Do you want to shuffle cards? y/n:").strip().lower()
+        
 
 
 if __name__ == '__main__':
