@@ -5,6 +5,9 @@ A command-line flashcard quiz built in Python.
 ## How to run
 python main.py
 
+## Running Tests
+python -m unittest -v
+
 ## What I learned
 - How to identify when a function is doing too much
 - Refactoring existing code without breaking it
