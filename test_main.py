@@ -200,6 +200,5 @@ class TestOfferPractice(unittest.TestCase):
         cards = [{"question": "Q1", "answer": "A1"}]
         offer_practice(cards, [], 5)
 
-
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,7 @@
 import random
+UNDERSTAND = "understand"
+STILL_LEARNING = "still_learning"
+QUIT_COMMAND = "quit"
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 UNDERSTAND = "understand"       # label for cards the user got right
